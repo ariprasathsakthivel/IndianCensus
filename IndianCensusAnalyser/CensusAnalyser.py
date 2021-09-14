@@ -1,12 +1,13 @@
 '''
 @Author: Ariprasath
-@Date: 2021-09-13 09:49:50
+@Date: 2021-09-14 09:49:50
 @Last Modified by: Ariprasath
 @Last Modified time: 2021-09-14
-Title: Open a CSV file, count the number of rows, return the extension of the file and return the header from the CSV file
+Title: Open a CSV file, count the number of rows, return the extension of the file and return the header from the CSV file. Also filters data from a file, create a new file and add all the data including the filtered data
 '''
 
 import csv
+from os import error
 
 class Error(Exception):
     def __init__(self,message):
@@ -28,12 +29,18 @@ class HeadersNotStringsError(Error):
     def __init__(self):
         self.message="Headers should be strings"
         super().__init__(self.message)
+class FileNotReadedError(Error):
+    def __init__(self):
+        self.message="No file is readed. Please read the file before filtering the data"
+        super().__init__(self.message)
+
 
 
 class CsvManipulsation():
     def __init__(self,file_name):
         self.file_name=file_name
         self.csv_data=list()
+        self.csv_data_dict=dict()
 
 
     def read_csv(self):
@@ -49,6 +56,7 @@ class CsvManipulsation():
             self.csv_reader=csv.reader(csv_file)
             for element in self.csv_reader:
                 self.csv_data.append(element)
+            
 
     def check_read_csv(self):
         '''
@@ -75,6 +83,44 @@ class CsvManipulsation():
             raise C
         else:
             return self.csv_data
+
+    def dict_convert(self):
+        '''
+        Description:
+            Generates a dictionary containing first index element as key and third index element as value.
+        Parameter:
+            None
+        Returns:
+            None
+        '''
+        try:
+            if self.csv_data==[]:
+                raise FileNotReadedError
+            else:
+                for element in self.csv_data[1:]:
+                    self.csv_data_dict[element[1]]=element[3]
+        except FileNotReadedError as F:
+            raise F
+        else:
+            return self.csv_data_dict
+            
+    def new_csv(self,census_data):
+        '''
+        Description:
+            Opens a csv file if exists or create a new csv file as a writer. adds a column of values dictionary into the csv file passed.
+        Parameter:
+            census_data(list): contains multiple lists containing data
+        Returns:
+            None
+        '''
+        with open("data/StateCensusDataupdated.csv",'w', newline="") as new_file:
+            csv_writer=csv.writer(new_file)
+            census_data[0].append("StateCode")
+            for element in census_data[1:]:
+                element.append(self.csv_data_dict[element[0]])
+            csv_writer.writerows(census_data)
+            
+
 
     def count_rows(self):
         '''
@@ -114,3 +160,11 @@ class CsvManipulsation():
             raise L
         except HeadersNotStringsError as S:
             raise S
+
+if __name__=="__main__":
+    census=CsvManipulsation("data/StateCensusData.csv")
+    census_data=census.check_read_csv()
+    code=CsvManipulsation("data/StateCode.csv")
+    code.check_read_csv()
+    code.dict_convert()
+    code.new_csv(census_data)
