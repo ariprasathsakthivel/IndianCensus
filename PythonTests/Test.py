@@ -7,6 +7,7 @@ Title: Test the CencusAnalyser module using pytest
 '''
 import sys
 import pytest
+import os
 sys.path.append("E:\CFP\Python\IndianCensus")
 from IndianCensusAnalyser import CensusAnalyser
 
@@ -75,3 +76,18 @@ class TestCensusAnalyser():
         self.obj2.check_read_csv()
         self.obj2.dict_convert()
         assert self.obj2.new_csv(census_data)==[['State', 'Population', 'AreaInSqKm', 'DensityPerSqKm', 'StateCode'], ["Sikki", "607688", "7096", "86", "None"]]
+    
+    def test_file_exists(self,obj):
+        census_data=self.obj1.check_read_csv()
+        self.obj2.check_read_csv()
+        self.obj2.dict_convert()
+        self.obj2.new_csv(census_data)
+        assert os.path.isfile('../data/StateCensusDataUpdated.csv')
+
+    def test_csv_json_error(self,obj):
+        with pytest.raises(CensusAnalyser.NotStringError):
+            self.obj1.csv_json(list("../data/StateCensusData.json"))
+    
+    def test_csv_json_file_exist(self,obj):
+        self.obj1.csv_json("../data/StateCensusData.json")
+        assert os.path.isfile("../data/StateCensusData.json")

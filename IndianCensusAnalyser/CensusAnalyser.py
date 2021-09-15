@@ -7,8 +7,7 @@ Title: Open a CSV file, count the number of rows, return the extension of the fi
 '''
 
 import csv
-from os import error
-
+import json
 class Error(Exception):
     def __init__(self,message):
         super().__init__(self.message)
@@ -166,10 +165,31 @@ class CsvManipulsation():
         except HeadersNotStringsError as S:
             raise S
 
+    def csv_json(self,json_file_path):
+        '''
+        Description:
+            Converts a csv file into a json file
+        Parameters:
+            json_file_path(string): The complete path of the file
+        Returns:
+            None
+        Raises:
+            NotStringError: Thrown if the entered json_file_path is not a string
+        '''
+        try:
+            if type(json_file_path)!=str:
+                raise NotStringError
+            else:
+                data_dict=dict()
+                with open(self.file_name,'r') as csv_file:
+                    csv_reader=csv.DictReader(csv_file)
+                    with open(json_file_path,'w') as json_file:
+                        for rows in csv_reader:
+                            json.dump(rows,json_file)
+                            json_file.write("\n")
+        except NotStringError as S:
+            raise S
+
 if __name__=="__main__":
     census=CsvManipulsation("../data/StateCensusData.csv")
-    census_data=census.check_read_csv()
-    code=CsvManipulsation("../data/StateCode.csv")
-    code.check_read_csv()
-    code.dict_convert()
-    code.new_csv(census_data)
+    census.csv_json("../data/StateCensusData.json")
