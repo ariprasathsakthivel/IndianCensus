@@ -113,12 +113,17 @@ class CsvManipulsation():
         Returns:
             None
         '''
-        with open("data/StateCensusDataupdated.csv",'w', newline="") as new_file:
+        with open("../data/StateCensusDataupdated.csv",'w', newline="") as new_file:
             csv_writer=csv.writer(new_file)
             census_data[0].append("StateCode")
             for element in census_data[1:]:
-                element.append(self.csv_data_dict[element[0]])
+                if list(self.csv_data_dict.keys()).count(element[0])>0:
+                    element.append(self.csv_data_dict[element[0]])
+                else:
+                    element.append("None")
+                    
             csv_writer.writerows(census_data)
+            return census_data
             
 
 
@@ -162,9 +167,9 @@ class CsvManipulsation():
             raise S
 
 if __name__=="__main__":
-    census=CsvManipulsation("data/StateCensusData.csv")
+    census=CsvManipulsation("../data/StateCensusData.csv")
     census_data=census.check_read_csv()
-    code=CsvManipulsation("data/StateCode.csv")
+    code=CsvManipulsation("../data/StateCode.csv")
     code.check_read_csv()
     code.dict_convert()
     code.new_csv(census_data)
