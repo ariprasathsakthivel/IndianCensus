@@ -75,4 +75,3 @@ class TestCensusAnalyser():
         self.obj2.check_read_csv()
         self.obj2.dict_convert()
         assert self.obj2.new_csv(census_data)==[['State', 'Population', 'AreaInSqKm', 'DensityPerSqKm', 'StateCode'], ["Sikki", "607688", "7096", "86", "None"]]
-        
